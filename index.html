@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MSG - Monitoring Sampah Green-Campus</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js untuk grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+    <header class="navbar">
+        <div class="navbar-container">
+
+            <!-- Logo / Judul Aplikasi -->
+            <div class="brand">
+                <div class="brand-logo">MSG</div>
+
+                <div class="brand-name">
+                    <h2>MSG</h2>
+                    <span>Monitoring Sampah Green-Campus</span>
+                </div>
+            </div>
+
+            <!-- Menu Navigasi -->
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-link active">
+                    Dashboard
+                </a>
+
+                <a href="#monitoring" class="nav-link">
+                    Data Monitoring
+                </a>
+
+                <a href="#riwayat" class="nav-link">
+                    Riwayat Monitoring
+                </a>
+            </nav>
+
+            <!-- Profil Admin -->
+            <div class="profile">
+                <div class="profile-avatar">
+                    A
+                </div>
+
+                <div class="profile-info">
+                    <strong>Admin</strong>
+                    <span>Administrator</span>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+    <main class="main-content">
+
+        <!-- =========================
+             DASHBOARD
+        ========================== -->
+        <section id="dashboard" class="page-section active-section">
+
+            <div class="container">
+
+                <!-- Header Dashboard -->
+                <div class="page-header">
+
+                    <div>
+                        <p class="page-label">
+                            SISTEM INFORMASI
+                        </p>
+
+                        <h1>
+                            Dashboard Monitoring Sampah
+                        </h1>
+
+                        <p class="page-description">
+                            Pantau kondisi dan volume sampah di lingkungan
+                            Green-Campus secara terpusat.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        id="openModalMonitoring">
+                        + Tambah Monitoring
+                    </button>
+
+                </div>
+
+
+                <!-- =========================
+                     STATISTIK
+                ========================== -->
+                <div class="stats-grid">
+
+                    <!-- Total Lokasi -->
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <span class="stat-title">
+                                Total Lokasi
+                            </span>
+
+                            <h2 id="totalLocations">
+                                0
+                            </h2>
+
+                            <p>
+                                Lokasi fakultas dipantau
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <!-- Total Sampah -->
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <span class="stat-title">
+                                Total Volume Sampah
+                            </span>
+
+                            <h2 id="totalWaste">
+                                0 kg
+                            </h2>
+
+                            <p>
+                                Hasil monitoring
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <!-- Lokasi Bersih -->
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <span class="stat-title">
+                                Lokasi Bersih
+                            </span>
+
+                            <h2 id="cleanLocations">
+                                0
+                            </h2>
+
+                            <p>
+                                Kondisi baik
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <!-- Perlu Perhatian -->
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <span class="stat-title">
+                                Perlu Perhatian
+                            </span>
+
+                            <h2 id="attentionLocations">
+                                0
+                            </h2>
+
+                            <p>
+                                Kondisi sedang atau menumpuk
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     GRAFIK
+                ========================== -->
+                <div class="charts-grid">
+
+                    <!-- Grafik Volume Sampah -->
+                    <div class="chart-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h3>
+                                    Volume Sampah
+                                </h3>
+
+                                <p>
+                                    Perkembangan volume sampah berdasarkan
+                                    tanggal monitoring
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="wasteChart"></canvas>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Grafik Jenis Sampah -->
+                    <div class="chart-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h3>
+                                    Komposisi Sampah
+                                </h3>
+
+                                <p>
+                                    Perbandingan jenis sampah yang ditemukan
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="compositionChart"></canvas>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     MONITORING TERBARU
+                ========================== -->
+                <div class="data-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>
+                                Monitoring Terbaru
+                            </h3>
+
+                            <p>
+                                Data hasil pemantauan sampah terbaru
+                            </p>
+                        </div>
+
+                        <a href="#monitoring" class="view-all">
+                            Lihat Semua
+                        </a>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Lokasi</th>
+                                    <th>Jenis Sampah</th>
+                                    <th>Volume</th>
+                                    <th>Kondisi</th>
+                                    <th>Tanggal</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="dashboardTable">
+                                <!-- Data diisi oleh JavaScript -->
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             DATA MONITORING
+        ========================== -->
+        <section id="monitoring" class="page-section">
+
+            <div class="container">
+
+                <!-- Header -->
+                <div class="page-header">
+
+                    <div>
+                        <p class="page-label">
+                            DATA
+                        </p>
+
+                        <h1>
+                            Data Monitoring Sampah
+                        </h1>
+
+                        <p class="page-description">
+                            Kelola data hasil pemantauan sampah pada setiap
+                            lokasi Green-Campus.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        id="openModalMonitoring2">
+                        + Tambah Monitoring
+                    </button>
+
+                </div>
+
+
+                <!-- =========================
+                     FILTER
+                ========================== -->
+                <div class="filter-card">
+
+                    <!-- Search -->
+                    <div class="search-box">
+
+                        <label for="searchInput">
+                            Cari lokasi
+                        </label>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Masukkan nama lokasi...">
+
+                    </div>
+
+
+                    <!-- Filter Kondisi -->
+                    <div class="filter-box">
+
+                        <label for="statusFilter">
+                            Kondisi
+                        </label>
+
+                        <select id="statusFilter">
+
+                            <option value="all">
+                                Semua Kondisi
+                            </option>
+
+                            <option value="Bersih">
+                                Bersih
+                            </option>
+
+                            <option value="Sedang">
+                                Sedang
+                            </option>
+
+                            <option value="Menumpuk">
+                                Menumpuk
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Filter Jenis -->
+                    <div class="filter-box">
+
+                        <label for="typeFilter">
+                            Jenis Sampah
+                        </label>
+
+                        <select id="typeFilter">
+
+                            <option value="all">
+                                Semua Jenis
+                            </option>
+
+                            <option value="Organik">
+                                Organik
+                            </option>
+
+                            <option value="Anorganik">
+                                Anorganik
+                            </option>
+
+                            <option value="Campuran">
+                                Campuran
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     TABEL MONITORING
+                ========================== -->
+                <div class="data-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>
+                                Data Monitoring
+                            </h3>
+
+                            <p>
+                                Daftar hasil pemantauan sampah
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Lokasi</th>
+                                    <th>Jenis Sampah</th>
+                                    <th>Volume</th>
+                                    <th>Kondisi</th>
+                                    <th>Tanggal</th>
+                                    <th>Keterangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="monitoringTable">
+                                <!-- Data diisi oleh JavaScript -->
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             RIWAYAT MONITORING
+        ========================== -->
+        <section id="riwayat" class="page-section">
+
+            <div class="container">
+
+                <div class="page-header">
+
+                    <div>
+                        <p class="page-label">
+                            RIWAYAT
+                        </p>
+
+                        <h1>
+                            Riwayat Monitoring
+                        </h1>
+
+                        <p class="page-description">
+                            Rekapitulasi aktivitas monitoring sampah yang
+                            telah dilakukan.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- Riwayat akan dibuat oleh JavaScript -->
+                <div
+                    class="history-container"
+                    id="historyContainer">
+
+                    <!-- Data riwayat diisi oleh JavaScript -->
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         MODAL TAMBAH MONITORING
+    ========================== -->
+    <div
+        class="modal"
+        id="monitoringModal">
+
+        <div class="modal-content">
+
+            <!-- Header Modal -->
+            <div class="modal-header">
+
+                <div>
+                    <h2>
+                        Tambah Data Monitoring
+                    </h2>
+
+                    <p>
+                        Masukkan hasil pemantauan sampah.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeModal">
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- Form -->
+            <form id="monitoringForm">
+
+                <!-- Lokasi -->
+                <div class="form-group">
+
+                    <label for="location">
+                        Lokasi
+                    </label>
+
+                    <select
+                        id="location"
+                        name="location"
+                        required>
+
+                        <option value="">
+                            Pilih lokasi
+                        </option>
+
+                        <option value="Fakultas Teknik">
+                            Fakultas Teknik
+                        </option>
+
+                        <option value="Fakultas FISIP">
+                            Fakultas FISIP
+                        </option>
+
+                        <option value="Fakultas FEB">
+                            Fakultas FEB
+                        </option>
+
+                        <option value="FKIP">
+                            FKIP
+                        </option>
+
+                        <option value="Fakultas Hukum">
+                            Fakultas Hukum
+                        </option>
+
+                        <option value="FMIPA">
+                            FMIPA
+                        </option>
+
+                        <option value="Fakultas Kesehatan Masyarakat">
+                            Fakultas Kesehatan Masyarakat
+                        </option>
+
+                        <option value="Fakultas Kedokteran">
+                            Fakultas Kedokteran
+                        </option>
+
+                        <option value="Fakultas Kehutanan">
+                            Fakultas Kehutanan
+                        </option>
+
+                        <option value="Fakultas Pertanian">
+                            Fakultas Pertanian
+                        </option>
+
+                        <option value="Pascasarjana">
+                            Pascasarjana
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Jenis Sampah -->
+                <div class="form-group">
+
+                    <label for="type">
+                        Jenis Sampah
+                    </label>
+
+                    <select
+                        id="type"
+                        name="type"
+                        required>
+
+                        <option value="">
+                            Pilih jenis sampah
+                        </option>
+
+                        <option value="Organik">
+                            Organik
+                        </option>
+
+                        <option value="Anorganik">
+                            Anorganik
+                        </option>
+
+                        <option value="Campuran">
+                            Campuran
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Volume -->
+                <div class="form-group">
+
+                    <label for="weight">
+                        Volume Sampah (kg)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="weight"
+                        name="weight"
+                        min="0"
+                        step="0.1"
+                        placeholder="Contoh: 25"
+                        required>
+
+                </div>
+
+
+                <!-- Kondisi -->
+                <div class="form-group">
+
+                    <label for="status">
+                        Kondisi Sampah
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        required>
+
+                        <option value="">
+                            Pilih kondisi
+                        </option>
+
+                        <option value="Bersih">
+                            Bersih
+                        </option>
+
+                        <option value="Sedang">
+                            Sedang
+                        </option>
+
+                        <option value="Menumpuk">
+                            Menumpuk
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Tanggal -->
+                <div class="form-group">
+
+                    <label for="date">
+                        Tanggal Monitoring
+                    </label>
+
+                    <input
+                        type="date"
+                        id="date"
+                        name="date"
+                        required>
+
+                </div>
+
+
+                <!-- Keterangan -->
+                <div class="form-group">
+
+                    <label for="note">
+                        Keterangan
+                    </label>
+
+                    <textarea
+                        id="note"
+                        name="note"
+                        rows="3"
+                        placeholder="Tambahkan keterangan jika diperlukan..."></textarea>
+
+                </div>
+
+
+                <!-- Tombol -->
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        id="cancelModal">
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-primary">
+                        Simpan Data
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+    <script src="script.js"></script>
+
+</body>
+</html>
