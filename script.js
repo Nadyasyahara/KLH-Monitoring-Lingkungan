@@ -1,8 +1,28 @@
-/* =========================================
-   DATA MONITORING
-========================================= */
+// ======================================================
+// AKUN PENGGUNA
+// ======================================================
 
-let monitoringData = [
+const accounts = [
+    {
+        username: "admin",
+        password: "admin123",
+        name: "Admin",
+        role: "Admin"
+    },
+    {
+        username: "user",
+        password: "user123",
+        name: "Pengguna",
+        role: "Pengguna"
+    }
+];
+
+
+// ======================================================
+// DATA AWAL
+// ======================================================
+
+const initialData = [
     {
         id: 1,
         location: "Fakultas Teknik",
@@ -10,7 +30,8 @@ let monitoringData = [
         weight: 42,
         status: "Menumpuk",
         date: "2026-09-05",
-        note: "Sampah plastik cukup banyak ditemukan."
+        note: "Volume sampah cukup tinggi.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -20,7 +41,8 @@ let monitoringData = [
         weight: 18,
         status: "Bersih",
         date: "2026-09-05",
-        note: "Kondisi lingkungan cukup bersih."
+        note: "Kondisi lokasi bersih.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -30,7 +52,8 @@ let monitoringData = [
         weight: 27,
         status: "Sedang",
         date: "2026-09-04",
-        note: "Terdapat beberapa sampah di sekitar area."
+        note: "Terdapat beberapa sampah.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -40,7 +63,8 @@ let monitoringData = [
         weight: 22,
         status: "Sedang",
         date: "2026-09-04",
-        note: "Sampah daun dan sisa makanan."
+        note: "Perlu dilakukan pemantauan.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -50,7 +74,8 @@ let monitoringData = [
         weight: 15,
         status: "Bersih",
         date: "2026-09-03",
-        note: "Kondisi lingkungan terpantau bersih."
+        note: "Kondisi cukup bersih.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -60,7 +85,8 @@ let monitoringData = [
         weight: 31,
         status: "Sedang",
         date: "2026-09-03",
-        note: "Terdapat sampah organik dan anorganik."
+        note: "Volume sampah sedang.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -70,7 +96,8 @@ let monitoringData = [
         weight: 20,
         status: "Bersih",
         date: "2026-09-02",
-        note: "Sampah relatif sedikit."
+        note: "Kondisi lingkungan baik.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -80,7 +107,8 @@ let monitoringData = [
         weight: 12,
         status: "Bersih",
         date: "2026-09-02",
-        note: "Kondisi lingkungan cukup baik."
+        note: "Tidak terdapat penumpukan.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -90,7 +118,8 @@ let monitoringData = [
         weight: 35,
         status: "Menumpuk",
         date: "2026-09-01",
-        note: "Banyak sampah daun pada area pemantauan."
+        note: "Terdapat penumpukan sampah organik.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -100,7 +129,8 @@ let monitoringData = [
         weight: 38,
         status: "Menumpuk",
         date: "2026-09-01",
-        note: "Volume sampah cukup tinggi."
+        note: "Volume sampah cukup tinggi.",
+        createdBy: "Pengguna"
     },
 
     {
@@ -110,184 +140,568 @@ let monitoringData = [
         weight: 16,
         status: "Sedang",
         date: "2026-08-31",
-        note: "Terdapat beberapa sampah plastik."
+        note: "Kondisi masih dalam pemantauan.",
+        createdBy: "Pengguna"
     }
 ];
 
 
-/* =========================================
-   FORMAT TANGGAL
-========================================= */
+// ======================================================
+// LOCAL STORAGE
+// ======================================================
 
-function formatDate(date) {
+let monitoringData =
+    JSON.parse(
+        localStorage.getItem("MSG_monitoringData")
+    ) || initialData;
 
-    const options = {
-        day: "2-digit",
-        month: "long",
-        year: "numeric"
-    };
 
-    return new Date(date).toLocaleDateString(
-        "id-ID",
-        options
+let currentUser =
+    JSON.parse(
+        sessionStorage.getItem("MSG_currentUser")
     );
+
+let wasteChart = null;
+let statusChart = null;
+let compositionChart = null;
+
+
+// ======================================================
+// ELEMENT
+// ======================================================
+
+const loginPage =
+    document.getElementById("loginPage");
+
+const appPage =
+    document.getElementById("appPage");
+
+
+// ======================================================
+// LOGIN
+// ======================================================
+
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        const username =
+            document.getElementById("loginUsername")
+                .value
+                .trim();
+
+        const password =
+            document.getElementById("loginPassword")
+                .value;
+
+        const account =
+            accounts.find(user =>
+                user.username === username &&
+                user.password === password
+            );
+
+
+        if (!account) {
+
+            document.getElementById("loginError")
+                .textContent =
+                "Username atau password salah.";
+
+            return;
+        }
+
+
+        currentUser = {
+            name: account.name,
+            role: account.role,
+            username: account.username
+        };
+
+
+        sessionStorage.setItem(
+            "MSG_currentUser",
+            JSON.stringify(currentUser)
+        );
+
+
+        document.getElementById("loginError")
+            .textContent = "";
+
+        showApplication();
+
+    });
+
+
+// ======================================================
+// MENAMPILKAN APLIKASI
+// ======================================================
+
+function showApplication() {
+
+    loginPage.classList.add("hidden");
+
+    appPage.classList.remove("hidden");
+
+
+    document.getElementById("userName")
+        .textContent = currentUser.name;
+
+    document.getElementById("userRole")
+        .textContent = currentUser.role;
+
+    document.getElementById("userAvatar")
+        .textContent =
+        currentUser.name.charAt(0).toUpperCase();
+
+
+    renderAll();
+
 }
 
 
-/* =========================================
-   STATUS CLASS
-========================================= */
+// ======================================================
+// LOGOUT
+// ======================================================
+
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", function () {
+
+        sessionStorage.removeItem(
+            "MSG_currentUser"
+        );
+
+        currentUser = null;
+
+        appPage.classList.add("hidden");
+
+        loginPage.classList.remove("hidden");
+
+        document.getElementById("loginForm")
+            .reset();
+
+    });
+
+
+// ======================================================
+// HELPER
+// ======================================================
+
+function saveData() {
+
+    localStorage.setItem(
+        "MSG_monitoringData",
+        JSON.stringify(monitoringData)
+    );
+
+}
+
+
+function formatDate(dateString) {
+
+    const date =
+        new Date(dateString + "T00:00:00");
+
+    return date.toLocaleDateString(
+        "id-ID",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
 
 function getStatusClass(status) {
 
     if (status === "Bersih") {
-        return "status status-bersih";
+        return "status-bersih";
     }
 
     if (status === "Sedang") {
-        return "status status-sedang";
+        return "status-sedang";
     }
 
-    if (status === "Menumpuk") {
-        return "status status-menumpuk";
-    }
+    return "status-menumpuk";
 
-    return "status";
 }
 
 
-/* =========================================
-   STATISTIK DASHBOARD
-========================================= */
+// ======================================================
+// DATA TERBARU PER LOKASI
+// ======================================================
 
-function renderStatistics() {
+function getLatestByLocation() {
 
-    const totalLocations =
-        new Set(
-            monitoringData.map(item => item.location)
-        ).size;
+    const latest = {};
+
+    monitoringData.forEach(item => {
+
+        if (
+            !latest[item.location] ||
+            new Date(item.date) >
+            new Date(latest[item.location].date)
+        ) {
+
+            latest[item.location] = item;
+
+        }
+
+    });
+
+    return Object.values(latest);
+
+}
+
+
+// ======================================================
+// STATISTIK
+// ======================================================
+
+function updateMainStatistics() {
 
     const totalWaste =
         monitoringData.reduce(
-            (total, item) => total + Number(item.weight),
+            (total, item) =>
+                total + Number(item.weight),
             0
         );
 
-    const cleanLocations =
-        new Set(
-            monitoringData
-                .filter(item => item.status === "Bersih")
-                .map(item => item.location)
-        ).size;
 
-    const attentionLocations =
-        new Set(
-            monitoringData
-                .filter(
-                    item =>
-                        item.status === "Sedang" ||
-                        item.status === "Menumpuk"
-                )
-                .map(item => item.location)
-        ).size;
+    const latestData =
+        getLatestByLocation();
 
 
-    document.getElementById("totalLocations").textContent =
-        totalLocations;
+    const clean =
+        latestData.filter(
+            item => item.status === "Bersih"
+        ).length;
 
-    document.getElementById("totalWaste").textContent =
-        totalWaste + " kg";
 
-    document.getElementById("cleanLocations").textContent =
-        cleanLocations;
+    const medium =
+        latestData.filter(
+            item => item.status === "Sedang"
+        ).length;
 
-    document.getElementById("attentionLocations").textContent =
-        attentionLocations;
+
+    const stacked =
+        latestData.filter(
+            item => item.status === "Menumpuk"
+        ).length;
+
+
+    document.getElementById("totalWaste")
+        .textContent =
+        `${totalWaste} kg`;
+
+    document.getElementById("cleanLocations")
+        .textContent =
+        clean;
+
+    document.getElementById("mediumLocations")
+        .textContent =
+        medium;
+
+    document.getElementById("stackedLocations")
+        .textContent =
+        stacked;
+
 }
 
 
-/* =========================================
-   TABEL DASHBOARD
-========================================= */
+// ======================================================
+// DATA BERKALA
+// ======================================================
+
+function updatePeriodicData() {
+
+    const today =
+        new Date();
+
+
+    const todayString =
+        today.toISOString()
+            .split("T")[0];
+
+
+    const sevenDaysAgo =
+        new Date(today);
+
+    sevenDaysAgo.setDate(
+        today.getDate() - 6
+    );
+
+
+    let todayWeight = 0;
+    let weekWeight = 0;
+    let monthWeight = 0;
+
+    let todayCount = 0;
+    let weekCount = 0;
+    let monthCount = 0;
+
+
+    monitoringData.forEach(item => {
+
+        const itemDate =
+            new Date(
+                item.date + "T00:00:00"
+            );
+
+
+        const weight =
+            Number(item.weight);
+
+
+        if (item.date === todayString) {
+
+            todayWeight += weight;
+
+            todayCount++;
+
+        }
+
+
+        if (itemDate >= sevenDaysAgo) {
+
+            weekWeight += weight;
+
+            weekCount++;
+
+        }
+
+
+        if (
+            itemDate.getMonth() ===
+            today.getMonth() &&
+
+            itemDate.getFullYear() ===
+            today.getFullYear()
+        ) {
+
+            monthWeight += weight;
+
+            monthCount++;
+
+        }
+
+    });
+
+
+    document.getElementById("todayWaste")
+        .textContent =
+        `${todayWeight} kg`;
+
+    document.getElementById("todayMonitoring")
+        .textContent =
+        `${todayCount} monitoring`;
+
+
+    document.getElementById("weekWaste")
+        .textContent =
+        `${weekWeight} kg`;
+
+    document.getElementById("weekMonitoring")
+        .textContent =
+        `${weekCount} monitoring`;
+
+
+    document.getElementById("monthWaste")
+        .textContent =
+        `${monthWeight} kg`;
+
+    document.getElementById("monthMonitoring")
+        .textContent =
+        `${monthCount} monitoring`;
+
+}
+
+
+// ======================================================
+// INDIKATOR LINGKUNGAN
+// ======================================================
+
+function updateIndicators() {
+
+    const totalVolume =
+        monitoringData.reduce(
+            (total, item) =>
+                total + Number(item.weight),
+            0
+        );
+
+
+    const typeTotals = {};
+
+
+    monitoringData.forEach(item => {
+
+        if (!typeTotals[item.type]) {
+            typeTotals[item.type] = 0;
+        }
+
+        typeTotals[item.type] +=
+            Number(item.weight);
+
+    });
+
+
+    let dominantType = "-";
+
+
+    if (
+        Object.keys(typeTotals).length > 0
+    ) {
+
+        dominantType =
+            Object.keys(typeTotals)
+                .reduce((a, b) =>
+                    typeTotals[a] >
+                    typeTotals[b]
+                        ? a
+                        : b
+                );
+
+    }
+
+
+    let highest = null;
+
+
+    monitoringData.forEach(item => {
+
+        if (
+            !highest ||
+            Number(item.weight) >
+            Number(highest.weight)
+        ) {
+
+            highest = item;
+
+        }
+
+    });
+
+
+    document.getElementById("indicatorVolume")
+        .textContent =
+        `${totalVolume} kg`;
+
+
+    document.getElementById("dominantType")
+        .textContent =
+        dominantType;
+
+
+    if (highest) {
+
+        document.getElementById("highestLocation")
+            .textContent =
+            highest.location;
+
+        document.getElementById(
+            "highestLocationValue"
+        ).textContent =
+            `${highest.weight} kg`;
+
+    }
+
+}
+
+
+// ======================================================
+// DASHBOARD TABLE
+// ======================================================
 
 function renderDashboardTable() {
 
     const table =
-        document.getElementById("dashboardTable");
+        document.getElementById(
+            "dashboardTable"
+        );
 
-    table.innerHTML = "";
 
-
-    const latestData =
+    const sorted =
         [...monitoringData]
             .sort(
                 (a, b) =>
                     new Date(b.date) -
                     new Date(a.date)
             )
-            .slice(0, 6);
+            .slice(0, 5);
 
-
-    latestData.forEach((item, index) => {
-
-        const row =
-            document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${index + 1}</td>
-
-            <td>
-                <strong>${item.location}</strong>
-            </td>
-
-            <td>${item.type}</td>
-
-            <td>
-                ${item.weight} kg
-            </td>
-
-            <td>
-                <span class="${getStatusClass(item.status)}">
-                    ${item.status}
-                </span>
-            </td>
-
-            <td>
-                ${formatDate(item.date)}
-            </td>
-        `;
-
-        table.appendChild(row);
-    });
-}
-
-
-/* =========================================
-   TABEL DATA MONITORING
-========================================= */
-
-function renderMonitoringTable() {
-
-    const table =
-        document.getElementById("monitoringTable");
 
     table.innerHTML = "";
 
 
+    sorted.forEach((item, index) => {
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${index + 1}</td>
+
+                <td>${item.location}</td>
+
+                <td>${item.type}</td>
+
+                <td>${item.weight} kg</td>
+
+                <td>
+                    <span class="status-badge ${getStatusClass(item.status)}">
+                        ${item.status}
+                    </span>
+                </td>
+
+                <td>
+                    ${formatDate(item.date)}
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+// ======================================================
+// TABEL MONITORING
+// ======================================================
+
+function renderMonitoringTable() {
+
+    const table =
+        document.getElementById(
+            "monitoringTable"
+        );
+
+
     const search =
-        document
-            .getElementById("searchInput")
-            .value
-            .toLowerCase();
-
-    const statusFilter =
-        document.getElementById("statusFilter").value;
-
-    const typeFilter =
-        document.getElementById("typeFilter").value;
+        document.getElementById(
+            "searchInput"
+        ).value.toLowerCase();
 
 
-    const filteredData =
+    const status =
+        document.getElementById(
+            "statusFilter"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "typeFilter"
+        ).value;
+
+
+    const filtered =
         monitoringData.filter(item => {
 
             const matchSearch =
@@ -295,107 +709,137 @@ function renderMonitoringTable() {
                     .toLowerCase()
                     .includes(search);
 
+
             const matchStatus =
-                statusFilter === "all" ||
-                item.status === statusFilter;
+                status === "all" ||
+                item.status === status;
+
 
             const matchType =
-                typeFilter === "all" ||
-                item.type === typeFilter;
+                type === "all" ||
+                item.type === type;
+
 
             return (
                 matchSearch &&
                 matchStatus &&
                 matchType
             );
+
         });
 
 
-    if (filteredData.length === 0) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="8" class="empty-data">
-                    Data monitoring tidak ditemukan.
-                </td>
-            </tr>
-        `;
-
-        return;
-    }
+    table.innerHTML = "";
 
 
-    filteredData.forEach((item, index) => {
+    filtered.forEach((item, index) => {
 
-        const row =
-            document.createElement("tr");
+        let actionHTML = "-";
 
-        row.innerHTML = `
-            <td>${index + 1}</td>
 
-            <td>
-                <strong>${item.location}</strong>
-            </td>
+        // ADMIN MEMILIKI HAK KELOLA
+        if (
+            currentUser &&
+            currentUser.role === "Admin"
+        ) {
 
-            <td>${item.type}</td>
-
-            <td>
-                ${item.weight} kg
-            </td>
-
-            <td>
-                <span class="${getStatusClass(item.status)}">
-                    ${item.status}
-                </span>
-            </td>
-
-            <td>
-                ${formatDate(item.date)}
-            </td>
-
-            <td>
-                ${item.note || "-"}
-            </td>
-
-            <td>
+            actionHTML = `
 
                 <div class="action-group">
 
                     <button
-                        class="btn-action btn-status"
-                        onclick="changeStatus(${item.id})">
-                        Status
+                        class="edit-btn"
+                        onclick="editMonitoring(${item.id})"
+                    >
+                        Edit
                     </button>
 
                     <button
-                        class="btn-action btn-delete"
-                        onclick="deleteMonitoring(${item.id})">
+                        class="delete-btn"
+                        onclick="deleteMonitoring(${item.id})"
+                    >
                         Hapus
                     </button>
 
                 </div>
 
-            </td>
+            `;
+
+        }
+
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${index + 1}</td>
+
+                <td>${item.location}</td>
+
+                <td>${item.type}</td>
+
+                <td>${item.weight} kg</td>
+
+                <td>
+                    <span class="status-badge ${getStatusClass(item.status)}">
+                        ${item.status}
+                    </span>
+                </td>
+
+                <td>
+                    ${formatDate(item.date)}
+                </td>
+
+                <td>
+                    ${item.createdBy || "Pengguna"}
+                </td>
+
+                <td>
+                    ${actionHTML}
+                </td>
+
+            </tr>
+
         `;
 
-        table.appendChild(row);
     });
+
+
+    if (filtered.length === 0) {
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="empty-state"
+                >
+                    Data monitoring tidak ditemukan.
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
 }
 
 
-/* =========================================
-   RIWAYAT MONITORING
-========================================= */
+// ======================================================
+// RIWAYAT
+// ======================================================
 
 function renderHistory() {
 
     const container =
-        document.getElementById("historyContainer");
+        document.getElementById(
+            "historyContainer"
+        );
 
-    container.innerHTML = "";
 
-
-    const sortedData =
+    const sorted =
         [...monitoringData]
             .sort(
                 (a, b) =>
@@ -404,94 +848,96 @@ function renderHistory() {
             );
 
 
-    sortedData.forEach(item => {
+    container.innerHTML = "";
 
-        const history =
-            document.createElement("div");
 
-        history.className = "history-item";
+    sorted.forEach(item => {
 
-        history.innerHTML = `
+        container.innerHTML += `
 
-            <div class="history-main">
+            <div class="history-item">
 
                 <div class="history-date">
                     ${formatDate(item.date)}
                 </div>
 
-                <div>
 
-                    <div class="history-location">
+                <div class="history-content">
+
+                    <h3>
                         ${item.location}
-                    </div>
+                    </h3>
 
-                    <div class="history-detail">
-                        ${item.type} •
-                        ${item.weight} kg
-                    </div>
+                    <p>
+                        Jenis: ${item.type}
+                    </p>
+
+                    <p>
+                        Volume: ${item.weight} kg
+                    </p>
+
+                    <span class="status-badge ${getStatusClass(item.status)}">
+                        ${item.status}
+                    </span>
+
+                    <p>
+                        Input oleh:
+                        ${item.createdBy || "Pengguna"}
+                    </p>
+
+                    ${
+                        item.note
+                            ? `<p>${item.note}</p>`
+                            : ""
+                    }
 
                 </div>
 
             </div>
 
-
-            <div class="history-right">
-
-                <span class="${getStatusClass(item.status)}">
-                    ${item.status}
-                </span>
-
-                <span class="history-detail">
-                    ${item.note || "-"}
-                </span>
-
-            </div>
         `;
 
-        container.appendChild(history);
     });
+
 }
 
 
-/* =========================================
-   GRAFIK VOLUME SAMPAH
-========================================= */
+// ======================================================
+// GRAFIK TREN
+// ======================================================
 
-let wasteChart;
+function renderWasteChart() {
 
-
-function createWasteChart() {
-
-    const canvas =
-        document.getElementById("wasteChart");
-
-    if (!canvas) return;
+    const ctx =
+        document.getElementById(
+            "wasteChart"
+        );
 
 
-    const groupedData = {};
+    const dateTotals = {};
 
 
     monitoringData.forEach(item => {
 
-        if (!groupedData[item.date]) {
-            groupedData[item.date] = 0;
+        if (!dateTotals[item.date]) {
+            dateTotals[item.date] = 0;
         }
 
-        groupedData[item.date] +=
+        dateTotals[item.date] +=
             Number(item.weight);
+
     });
 
 
     const dates =
-        Object.keys(groupedData).sort();
-
-
-    const labels =
-        dates.map(date => formatDate(date));
+        Object.keys(dateTotals)
+            .sort();
 
 
     const values =
-        dates.map(date => groupedData[date]);
+        dates.map(
+            date => dateTotals[date]
+        );
 
 
     if (wasteChart) {
@@ -500,27 +946,34 @@ function createWasteChart() {
 
 
     wasteChart =
-        new Chart(canvas, {
+        new Chart(ctx, {
 
             type: "line",
 
             data: {
 
-                labels: labels,
+                labels:
+                    dates.map(formatDate),
 
-                datasets: [{
+                datasets: [
 
-                    label: "Volume Sampah (kg)",
+                    {
 
-                    data: values,
+                        label:
+                            "Volume Sampah (kg)",
 
-                    borderWidth: 2,
+                        data: values,
 
-                    tension: 0.3,
+                        borderWidth: 2,
 
-                    fill: false
+                        tension: 0.3,
 
-                }]
+                        fill: false
+
+                    }
+
+                ]
+
             },
 
             options: {
@@ -529,88 +982,91 @@ function createWasteChart() {
 
                 maintainAspectRatio: false,
 
-                plugins: {
-
-                    legend: {
-                        display: true
-                    }
-
-                },
-
                 scales: {
 
                     y: {
+
                         beginAtZero: true
+
                     }
 
                 }
+
             }
+
         });
+
 }
 
 
-/* =========================================
-   GRAFIK KOMPOSISI SAMPAH
-========================================= */
+// ======================================================
+// GRAFIK STATUS
+// ======================================================
 
-let compositionChart;
+function renderStatusChart() {
 
-
-function createCompositionChart() {
-
-    const canvas =
-        document.getElementById("compositionChart");
-
-    if (!canvas) return;
+    const ctx =
+        document.getElementById(
+            "statusChart"
+        );
 
 
-    const composition = {
-
-        Organik: 0,
-
-        Anorganik: 0,
-
-        Campuran: 0
-
-    };
+    const latest =
+        getLatestByLocation();
 
 
-    monitoringData.forEach(item => {
-
-        composition[item.type] +=
-            Number(item.weight);
-
-    });
+    const clean =
+        latest.filter(
+            item => item.status === "Bersih"
+        ).length;
 
 
-    if (compositionChart) {
-        compositionChart.destroy();
+    const medium =
+        latest.filter(
+            item => item.status === "Sedang"
+        ).length;
+
+
+    const stacked =
+        latest.filter(
+            item => item.status === "Menumpuk"
+        ).length;
+
+
+    if (statusChart) {
+        statusChart.destroy();
     }
 
 
-    compositionChart =
-        new Chart(canvas, {
+    statusChart =
+        new Chart(ctx, {
 
             type: "doughnut",
 
             data: {
 
                 labels: [
-                    "Organik",
-                    "Anorganik",
-                    "Campuran"
+                    "Bersih",
+                    "Sedang",
+                    "Menumpuk"
                 ],
 
-                datasets: [{
+                datasets: [
 
-                    data: [
-                        composition.Organik,
-                        composition.Anorganik,
-                        composition.Campuran
-                    ],
+                    {
 
-                    borderWidth: 2
-                }]
+                        data: [
+                            clean,
+                            medium,
+                            stacked
+                        ],
+
+                        borderWidth: 1
+
+                    }
+
+                ]
+
             },
 
             options: {
@@ -626,155 +1082,245 @@ function createCompositionChart() {
                     }
 
                 }
+
             }
+
         });
+
 }
 
 
-/* =========================================
-   MODAL
-========================================= */
+// ======================================================
+// GRAFIK KOMPOSISI
+// ======================================================
 
-const modal =
-    document.getElementById("monitoringModal");
+function renderCompositionChart() {
 
-const openButton =
-    document.getElementById("openModalMonitoring");
-
-const openButton2 =
-    document.getElementById("openModalMonitoring2");
-
-const closeButton =
-    document.getElementById("closeModal");
-
-const cancelButton =
-    document.getElementById("cancelModal");
+    const ctx =
+        document.getElementById(
+            "compositionChart"
+        );
 
 
-function openModal() {
-
-    modal.classList.add("show");
-
-    document.body.style.overflow = "hidden";
-}
+    const typeTotals = {};
 
 
-function closeModal() {
+    monitoringData.forEach(item => {
 
-    modal.classList.remove("show");
-
-    document.body.style.overflow = "auto";
-}
-
-
-openButton.addEventListener(
-    "click",
-    openModal
-);
-
-
-openButton2.addEventListener(
-    "click",
-    openModal
-);
-
-
-closeButton.addEventListener(
-    "click",
-    closeModal
-);
-
-
-cancelButton.addEventListener(
-    "click",
-    closeModal
-);
-
-
-/* Klik area luar modal */
-
-modal.addEventListener(
-    "click",
-    function(event) {
-
-        if (event.target === modal) {
-            closeModal();
+        if (!typeTotals[item.type]) {
+            typeTotals[item.type] = 0;
         }
 
+        typeTotals[item.type] +=
+            Number(item.weight);
+
+    });
+
+
+    if (compositionChart) {
+        compositionChart.destroy();
     }
-);
 
 
-/* =========================================
-   TAMBAH DATA MONITORING
-========================================= */
+    compositionChart =
+        new Chart(ctx, {
 
-const monitoringForm =
-    document.getElementById("monitoringForm");
+            type: "bar",
 
+            data: {
 
-monitoringForm.addEventListener(
-    "submit",
-    function(event) {
+                labels:
+                    Object.keys(typeTotals),
 
-        event.preventDefault();
+                datasets: [
 
+                    {
 
-        const newData = {
+                        label:
+                            "Volume Sampah (kg)",
 
-            id:
-                Date.now(),
+                        data:
+                            Object.values(typeTotals),
 
-            location:
-                document.getElementById("location").value,
+                        borderWidth: 1
 
-            type:
-                document.getElementById("type").value,
+                    }
 
-            weight:
-                Number(
-                    document.getElementById("weight").value
-                ),
+                ]
 
-            status:
-                document.getElementById("status").value,
+            },
 
-            date:
-                document.getElementById("date").value,
+            options: {
 
-            note:
-                document.getElementById("note").value
+                responsive: true,
 
-        };
+                maintainAspectRatio: false,
 
+                scales: {
 
-        monitoringData.unshift(newData);
+                    y: {
+                        beginAtZero: true
+                    }
 
+                }
 
-        saveData();
+            }
 
+        });
 
-        renderAll();
+}
 
 
-        monitoringForm.reset();
+// ======================================================
+// MODAL TAMBAH
+// ======================================================
+
+const monitoringModal =
+    document.getElementById(
+        "monitoringModal"
+    );
 
 
-        closeModal();
+function openMonitoringModal() {
 
+    monitoringModal.classList.add("show");
+
+}
+
+
+function closeMonitoringModal() {
+
+    monitoringModal.classList.remove("show");
+
+}
+
+
+document
+    .getElementById(
+        "openModalMonitoring"
+    )
+    .addEventListener(
+        "click",
+        openMonitoringModal
+    );
+
+
+document
+    .getElementById(
+        "openModalMonitoring2"
+    )
+    .addEventListener(
+        "click",
+        openMonitoringModal
+    );
+
+
+document
+    .getElementById("closeModal")
+    .addEventListener(
+        "click",
+        closeMonitoringModal
+    );
+
+
+document
+    .getElementById("cancelModal")
+    .addEventListener(
+        "click",
+        closeMonitoringModal
+    );
+
+
+// ======================================================
+// TAMBAH DATA MONITORING
+// ======================================================
+
+document
+    .getElementById("monitoringForm")
+    .addEventListener(
+        "submit",
+        function (e) {
+
+            e.preventDefault();
+
+
+            const newData = {
+
+                id: Date.now(),
+
+                location:
+                    document.getElementById(
+                        "location"
+                    ).value,
+
+                type:
+                    document.getElementById(
+                        "type"
+                    ).value,
+
+                weight:
+                    Number(
+                        document.getElementById(
+                            "weight"
+                        ).value
+                    ),
+
+                status:
+                    document.getElementById(
+                        "status"
+                    ).value,
+
+                date:
+                    document.getElementById(
+                        "date"
+                    ).value,
+
+                note:
+                    document.getElementById(
+                        "note"
+                    ).value,
+
+                createdBy:
+                    currentUser.name
+
+            };
+
+
+            monitoringData.push(newData);
+
+            saveData();
+
+            this.reset();
+
+            setDefaultDate();
+
+            closeMonitoringModal();
+
+            renderAll();
+
+        }
+    );
+
+
+// ======================================================
+// EDIT DATA - ADMIN
+// ======================================================
+
+function editMonitoring(id) {
+
+    if (
+        !currentUser ||
+        currentUser.role !== "Admin"
+    ) {
 
         alert(
-            "Data monitoring berhasil ditambahkan."
+            "Hanya Admin yang dapat mengedit data."
         );
+
+        return;
+
     }
-);
 
-
-/* =========================================
-   UBAH STATUS
-========================================= */
-
-function changeStatus(id) {
 
     const item =
         monitoringData.find(
@@ -785,42 +1331,185 @@ function changeStatus(id) {
     if (!item) return;
 
 
-    if (item.status === "Bersih") {
-
-        item.status = "Sedang";
-
-    } else if (item.status === "Sedang") {
-
-        item.status = "Menumpuk";
-
-    } else {
-
-        item.status = "Bersih";
-
-    }
+    document.getElementById("editId")
+        .value = item.id;
 
 
-    saveData();
+    document.getElementById("editLocation")
+        .value = item.location;
 
-    renderAll();
+
+    document.getElementById("editType")
+        .value = item.type;
+
+
+    document.getElementById("editWeight")
+        .value = item.weight;
+
+
+    document.getElementById("editStatus")
+        .value = item.status;
+
+
+    document.getElementById("editDate")
+        .value = item.date;
+
+
+    document.getElementById("editNote")
+        .value = item.note || "";
+
+
+    document
+        .getElementById("editModal")
+        .classList.add("show");
+
 }
 
 
-/* =========================================
-   HAPUS DATA
-========================================= */
+// ======================================================
+// SIMPAN EDIT
+// ======================================================
+
+document
+    .getElementById("editForm")
+    .addEventListener(
+        "submit",
+        function (e) {
+
+            e.preventDefault();
+
+
+            if (
+                !currentUser ||
+                currentUser.role !== "Admin"
+            ) {
+
+                return;
+
+            }
+
+
+            const id =
+                Number(
+                    document.getElementById(
+                        "editId"
+                    ).value
+                );
+
+
+            const item =
+                monitoringData.find(
+                    item => item.id === id
+                );
+
+
+            if (!item) return;
+
+
+            item.location =
+                document.getElementById(
+                    "editLocation"
+                ).value;
+
+
+            item.type =
+                document.getElementById(
+                    "editType"
+                ).value;
+
+
+            item.weight =
+                Number(
+                    document.getElementById(
+                        "editWeight"
+                    ).value
+                );
+
+
+            item.status =
+                document.getElementById(
+                    "editStatus"
+                ).value;
+
+
+            item.date =
+                document.getElementById(
+                    "editDate"
+                ).value;
+
+
+            item.note =
+                document.getElementById(
+                    "editNote"
+                ).value;
+
+
+            saveData();
+
+            closeEditModal();
+
+            renderAll();
+
+        }
+    );
+
+
+// ======================================================
+// TUTUP EDIT
+// ======================================================
+
+function closeEditModal() {
+
+    document
+        .getElementById("editModal")
+        .classList.remove("show");
+
+}
+
+
+document
+    .getElementById("closeEditModal")
+    .addEventListener(
+        "click",
+        closeEditModal
+    );
+
+
+document
+    .getElementById("cancelEdit")
+    .addEventListener(
+        "click",
+        closeEditModal
+    );
+
+
+// ======================================================
+// HAPUS DATA - ADMIN
+// ======================================================
 
 function deleteMonitoring(id) {
 
-    const confirmation =
+    if (
+        !currentUser ||
+        currentUser.role !== "Admin"
+    ) {
+
+        alert(
+            "Hanya Admin yang dapat menghapus data."
+        );
+
+        return;
+
+    }
+
+
+    const confirmDelete =
         confirm(
-            "Apakah Anda yakin ingin menghapus data monitoring ini?"
+            "Apakah data monitoring ini ingin dihapus?"
         );
 
 
-    if (!confirmation) {
-        return;
-    }
+    if (!confirmDelete) return;
 
 
     monitoringData =
@@ -832,12 +1521,107 @@ function deleteMonitoring(id) {
     saveData();
 
     renderAll();
+
 }
 
 
-/* =========================================
-   SEARCH DAN FILTER
-========================================= */
+// ======================================================
+// NAVIGASI
+// ======================================================
+
+document
+    .querySelectorAll(".nav-link")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function (e) {
+
+                e.preventDefault();
+
+                showSection(
+                    this.dataset.section
+                );
+
+            }
+        );
+
+    });
+
+
+function showSection(sectionId) {
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+
+            section.classList.remove(
+                "active-section"
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(".nav-link")
+        .forEach(link => {
+
+            link.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    const link =
+        document.querySelector(
+            `[data-section="${sectionId}"]`
+        );
+
+
+    if (section) {
+
+        section.classList.add(
+            "active-section"
+        );
+
+    }
+
+
+    if (link) {
+
+        link.classList.add("active");
+
+    }
+
+}
+
+
+// ======================================================
+// LIHAT SEMUA
+// ======================================================
+
+document
+    .getElementById("viewAllMonitoring")
+    .addEventListener(
+        "click",
+        function () {
+
+            showSection("monitoring");
+
+        }
+    );
+
+
+// ======================================================
+// SEARCH
+// ======================================================
 
 document
     .getElementById("searchInput")
@@ -863,147 +1647,35 @@ document
     );
 
 
-/* =========================================
-   NAVIGASI HALAMAN
-========================================= */
+// ======================================================
+// TANGGAL DEFAULT
+// ======================================================
 
-const navLinks =
-    document.querySelectorAll(".nav-link");
+function setDefaultDate() {
 
-const sections =
-    document.querySelectorAll(".page-section");
-
-
-function showSection(sectionId) {
-
-    sections.forEach(section => {
-
-        section.classList.remove(
-            "active-section"
-        );
-
-    });
-
-
-    const target =
-        document.getElementById(sectionId);
-
-    if (target) {
-
-        target.classList.add(
-            "active-section"
-        );
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }
-
-
-    navLinks.forEach(link => {
-
-        link.classList.remove("active");
-
-
-        if (
-            link.getAttribute("href") ===
-            "#" + sectionId
-        ) {
-
-            link.classList.add("active");
-
-        }
-
-    });
-}
-
-
-/* Klik menu navigasi */
-
-navLinks.forEach(link => {
-
-    link.addEventListener(
-        "click",
-        function(event) {
-
-            event.preventDefault();
-
-
-            const sectionId =
-                this.getAttribute("href")
-                    .substring(1);
-
-
-            showSection(sectionId);
-
-        }
-    );
-
-});
-
-
-/* =========================================
-   LINK "LIHAT SEMUA"
-========================================= */
-
-const viewAll =
-    document.querySelector(".view-all");
-
-
-if (viewAll) {
-
-    viewAll.addEventListener(
-        "click",
-        function(event) {
-
-            event.preventDefault();
-
-            showSection("monitoring");
-
-        }
-    );
+    document.getElementById("date")
+        .value =
+        new Date()
+            .toISOString()
+            .split("T")[0];
 
 }
 
 
-/* =========================================
-   LOCAL STORAGE
-========================================= */
-
-function saveData() {
-
-    localStorage.setItem(
-        "MSG_monitoringData",
-        JSON.stringify(monitoringData)
-    );
-}
+setDefaultDate();
 
 
-function loadData() {
-
-    const savedData =
-        localStorage.getItem(
-            "MSG_monitoringData"
-        );
-
-
-    if (savedData) {
-
-        monitoringData =
-            JSON.parse(savedData);
-
-    }
-}
-
-
-/* =========================================
-   RENDER SEMUA DATA
-========================================= */
+// ======================================================
+// RENDER SEMUA
+// ======================================================
 
 function renderAll() {
 
-    renderStatistics();
+    updateMainStatistics();
+
+    updatePeriodicData();
+
+    updateIndicators();
 
     renderDashboardTable();
 
@@ -1011,16 +1683,21 @@ function renderAll() {
 
     renderHistory();
 
-    createWasteChart();
+    renderWasteChart();
 
-    createCompositionChart();
+    renderStatusChart();
+
+    renderCompositionChart();
+
 }
 
 
-/* =========================================
-   JALANKAN APLIKASI
-========================================= */
+// ======================================================
+// CEK SESSION
+// ======================================================
 
-loadData();
+if (currentUser) {
 
-renderAll();
+    showApplication();
+
+}
