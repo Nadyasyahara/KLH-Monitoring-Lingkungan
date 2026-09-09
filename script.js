@@ -1,47 +1,86 @@
 // ======================================================
-// AKUN PENGGUNA
+// AKUN ADMIN
 // ======================================================
 
-const accounts = [
+const adminAccounts = [
     {
         username: "admin",
         password: "admin123",
         name: "Admin",
         role: "Admin"
     },
-    {
-        username: "nadya",
-        password: "nadya123",
-        name: "Nadya",
-        role: "Pengguna"
-    },
-    {
-        username: "rianti",
-        password: "rianti123",
-        name: "Rianti",
-        role: "Pengguna"
-    },
-    {
-        username: "cindy",
-        password: "cindy123",
-        name: "Cindy",
-        role: "Pengguna"
-    },
-    {
-        username: "Andhin",
-        password: "andhin123",
-        name: "Andhin",
-        role: "Pengguna"
-    },
-    {
-        username: "Rizka",
-        password: "rizka123",
-        name: "Rizka",
-        role: "Pengguna"
-    },
 ];
 
+// ======================================================
+// AKUN Pengguna
+// ======================================================
 
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+const showRegister = document.getElementById("showRegister");
+const showLogin = document.getElementById("showLogin");
+
+showRegister.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    loginForm.classList.add("hidden");
+    registerForm.classList.remove("hidden");
+});
+
+showLogin.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    registerForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
+});
+
+// ======================================================
+// TOGGLE PASSWORD
+// ======================================================
+
+const togglePassword =
+    document.getElementById("togglePassword");
+
+const loginPassword =
+    document.getElementById("loginPassword");
+
+togglePassword.addEventListener("click", function () {
+
+    const passwordWrapper =
+        document.querySelector(".password-wrapper");
+
+    if (loginPassword.type === "password") {
+
+        // Tampilkan password
+        loginPassword.type = "text";
+
+        passwordWrapper.classList.add(
+            "show-password"
+        );
+
+        togglePassword.setAttribute(
+            "aria-label",
+            "Sembunyikan password"
+        );
+
+    } else {
+
+        // Sembunyikan password
+        loginPassword.type = "password";
+
+        passwordWrapper.classList.remove(
+            "show-password"
+        );
+
+        togglePassword.setAttribute(
+            "aria-label",
+            "Tampilkan password"
+        );
+
+    }
+
+});
 // ======================================================
 // DATA AWAL
 // ======================================================

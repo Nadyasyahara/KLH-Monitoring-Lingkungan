@@ -74,17 +74,25 @@ body {
     text-align: center;
 }
 
-.demo-account {
-    margin-top: 25px;
-    padding: 15px;
-    background: #f5f7f6;
-    border-radius: 10px;
+.register-link {
     text-align: center;
-    color: #666;
-    font-size: 12px;
-    line-height: 1.7;
+    margin-top: 15px;
+    font-size: 14px;
 }
 
+.register-link a {
+    color: #245b45;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none !important;
+}
 
 /* ================================
    NAVBAR
@@ -725,6 +733,61 @@ td {
     margin-top: 20px;
 }
 
+/* ================================
+   PASSWORD TOGGLE
+================================ */
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 45px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 24px;
+    height: 24px;
+
+    border: none;
+    background: transparent;
+    color: #777;
+
+    padding: 0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-password:hover {
+    color: #245b45;
+}
+
+.toggle-password svg {
+    width: 19px;
+    height: 19px;
+}
+
+/* Saat password tersembunyi */
+#eyeOpen {
+    display: none;
+}
+
+/* Saat password terlihat */
+.password-wrapper.show-password #eyeClosed {
+    display: none;
+}
+
+.password-wrapper.show-password #eyeOpen {
+    display: block;
+}
 
 /* ================================
    RESPONSIVE
