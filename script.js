@@ -10,11 +10,35 @@ const accounts = [
         role: "Admin"
     },
     {
-        username: "user",
-        password: "user123",
-        name: "Pengguna",
+        username: "nadya",
+        password: "nadya123",
+        name: "Nadya",
         role: "Pengguna"
-    }
+    },
+    {
+        username: "rianti",
+        password: "rianti123",
+        name: "Rianti",
+        role: "Pengguna"
+    },
+    {
+        username: "cindy",
+        password: "cindy123",
+        name: "Cindy",
+        role: "Pengguna"
+    },
+    {
+        username: "Andhin",
+        password: "andhin123",
+        name: "Andhin",
+        role: "Pengguna"
+    },
+    {
+        username: "Rizka",
+        password: "rizka123",
+        name: "Rizka",
+        role: "Pengguna"
+    },
 ];
 
 
